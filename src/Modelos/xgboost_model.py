@@ -3,6 +3,7 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve, auc
+import joblib
 
 class XGBoostModel:
     def __init__(self, eval_metric="logloss"):
@@ -44,3 +45,12 @@ class XGBoostModel:
 
     def get_feature_importance(self):
         return self.model.feature_importances_
+
+    def save_model(self, filename):
+        joblib.dump(self.model, filename)
+
+    @classmethod
+    def load_model(cls, filename):
+        instance = cls()
+        instance.model = joblib.load(filename)
+        return instance

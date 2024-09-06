@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve, auc
 from sklearn.preprocessing import StandardScaler
+import joblib
 
 class LogisticModel:
     def __init__(self, max_iter=10000):
@@ -11,7 +12,7 @@ class LogisticModel:
         self.scaler = StandardScaler()
 
     def prepare_data(self, X, y, test_size=0.3, random_state=42):
-        X_scaled = self.scaler.fit_transform(X)
+        X_scaled = pd.DataFrame(self.scaler.fit_transform(X), columns=X.columns)
         return train_test_split(X_scaled, y, test_size=test_size, random_state=random_state)
 
     def train(self, X_train, y_train):
@@ -46,3 +47,14 @@ class LogisticModel:
         train_accuracy = self.model.score(X_train, y_train)
         test_accuracy = accuracy_score(y_test, self.predict(X_test))
         return train_accuracy, test_accuracy
+
+    def save_model(self, filename):
+        joblib.dump({'model': self.model, 'scaler': self.scaler}, filename)
+
+    @classmethod
+    def load_model(cls, filename):
+        data = joblib.load(filename)
+        instance = cls()
+        instance.model = data['model']
+        instance.scaler = data['scaler']
+        return instance
