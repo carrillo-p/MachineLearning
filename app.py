@@ -74,11 +74,12 @@ def create_gauge_chart(value, title):
             'axis': {'range': [0, 100]},
             'bar': {'color': "darkblue"},
             'steps': [
-                {'range': [0, 50], 'color': "lightgray"},
+                {'range': [0, 25], 'color': "white"},
+                {'range': [25, 50], 'color': "lightgray"},
                 {'range': [50, 75], 'color': "gray"},
                 {'range': [75, 100], 'color': "darkgray"}],
             'threshold': {
-                'line': {'color': "red", 'width': 4},
+                'line': {'color': "red", 'width': 0},
                 'thickness': 0.75,
                 'value': 90}}))
     return fig
@@ -187,19 +188,6 @@ elif page == "Predicción de Satisfacción":
             st.plotly_chart(fig_xgboost, use_container_width=True)
             emoji = "😃" if xgboost_pred == 1 else "😞"
             st.metric("Predicción", f"{'Satisfecho' if xgboost_pred == 1 else 'Insatisfecho'} {emoji}")
-
-        # Comparación de modelos
-        st.subheader("Comparación de Modelos 🥊")
-        fig, ax = plt.subplots(figsize=(10, 6))
-        models = ['Logístico', 'XGBoost']
-        probs = [logistic_prob, xgboost_prob]
-        ax.bar(models, probs, color=['skyblue', 'lightgreen'])
-        ax.set_ylim(0, 1)
-        ax.set_ylabel('Probabilidad de Satisfacción')
-        ax.set_title('Comparación de Probabilidades entre Modelos')
-        for i, v in enumerate(probs):
-            ax.text(i, v, f'{v:.2f}', ha='center', va='bottom')
-        st.pyplot(fig)
 
         st.balloons()
 
