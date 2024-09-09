@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-def change_screen(new_screen):
-    st.session_state.screen = new_screen
-
 def home_screen():
     st.markdown(f"""<h1 style="text-align: center;"> Bienvenido al Predictor de Satisfacción de Aerolíneas ✈️) </h1>""", unsage_allow_html = True)
     st.markdown("""

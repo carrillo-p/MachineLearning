@@ -4,6 +4,9 @@ from GUI_screens import change_screen, home_screen, screen_predict
 if 'screen' not in st.session_state:
     st.session_state.screen = 'home'
 
+def change_screen(new_screen):
+    st.session_state.screen = new_screen
+
 st.set_page_config(layout='wide')
 
 custom_html = """
