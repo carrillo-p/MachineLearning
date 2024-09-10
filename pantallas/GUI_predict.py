@@ -3,16 +3,18 @@ import pandas as pd
 from pantallas.aux_functions import predict_satisfaction, create_gauge_chart
 from src.Modelos.logistic_model import LogisticModel
 from src.Modelos.xgboost_model import XGBoostModel
+from src.Modelos.stack_model import StackModel
 
 
 @st.cache_resource
 def load_models():
     logistic_model = LogisticModel.load_model('src/Modelos/logistic_model.joblib')
     xgboost_model = XGBoostModel.load_model('src/Modelos/xgboost_model.joblib')
-    return logistic_model, xgboost_model
+    stack_model = StackModel.load_model('src/Modelos/stack_model.joblib')
+    return logistic_model, xgboost_model, stack_model
 
 try:
-    logistic_model, xgboost_model = load_models()
+    logistic_model, xgboost_model, stack_model = load_models()
 except Exception as e:
     st.error(f"Error al cargar los modelos: {str(e)}")
     st.stop()
@@ -81,6 +83,7 @@ def screen_predict():
             # Realizar predicciones
             logistic_pred, logistic_prob = predict_satisfaction(logistic_model, inputs)
             xgboost_pred, xgboost_prob = predict_satisfaction(xgboost_model, inputs)
+            stack_pred, stack_prob = predict_satisfaction(stack_model, inputs)
         
         # Mostrar resultados
         st.subheader("Resultados de la Predicción 📊")
@@ -99,6 +102,13 @@ def screen_predict():
             st.plotly_chart(fig_xgboost, use_container_width=True)
             emoji = "😃" if xgboost_pred == 1 else "😞"
             st.metric("Predicción", f"{'Satisfecho' if xgboost_pred == 1 else 'Insatisfecho'} {emoji}")
+        
+    
+        st.markdown("<h3 style='text-align: center;'>Modelo Stacked</h3>", unsafe_allow_html=True)
+        fig_stack = create_gauge_chart(stack_prob * 100, "Probabilidad de Satisfacción")
+        st.plotly_chart(fig_stack, use_container_width=True)
+        emoji = "😃" if stack_pred == 1 else "😞"
+        st.metric("Predicción", f"{'Satisfecho' if stack_pred == 1 else 'Insatisfecho'} {emoji}")
 
         st.balloons()
 

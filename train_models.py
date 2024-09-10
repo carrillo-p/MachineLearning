@@ -26,7 +26,7 @@ def train_and_save_models():
 
     #Entrenar y guardar modelo Stack
     stack_model = StackModel()
-    X_train, X_test, y_train, y_test = logistic_model.prepare_data(X, y)
+    X_train, X_test, y_train, y_test = stack_model.prepare_data(X, y)
     stack_model.search_hyperparams(X_train, X_test, y_train, y_test)
     stack_model.init_model()
     stack_model.train(X_train, y_train, X_test, y_test)
