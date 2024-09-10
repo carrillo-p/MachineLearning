@@ -184,6 +184,31 @@ def generar_grafico_stack(tipo_grafico):
         plt.ylabel('Accuracy')
         plt.legend()
         plt.grid(True)
+
+    elif tipo_grafico == 'Variables más relevantes':
+        xgb_importance = stack_model.named_estimators_['xgb'].feature_importances_
+        rf_importance = stack_model.named_estimators_['rf'].feature_importances_
+        feature_names = X.columns
+
+        xgb_importance_df = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance': xgb_importance,
+        'Model': 'XGBoost'
+        })
+        rf_importance_df = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance': rf_importance,
+        'Model': 'RandomForest'
+        })
+
+        importance_df = pd.concat([xgb_importance_df, rf_importance_df])
+
+        importance_df = importance_df.sort_values(by='Importance', ascending=False)
+
+        sns.barplot(x='Importance', y='Feature', hue='Model', data=importance_df)
+        plt.title('Importancia de las Variables en los Modelos Base del StackingClassifier')
+        plt.xlabel('Importancia')
+        plt.ylabel('Variable')
     
     plt.tight_layout()  # Ajustar el diseño
     st.pyplot(plt.gcf())
@@ -391,7 +416,7 @@ def screen_informe():
 
                     A pesar de que ya hemos utilizado una técnica de ensemble con el _gradient boosting_, hemos querido demostrar el funcionamiento de un modelo que lo combine con _stacking_.
 
-                    Por ello, se ha decidido utilizar el modelo XGBoost que hemos podido ver que ofrece unos buenos resultados, en combinación con un modelo de regresión logística y un modelo de _random forest_ para comprobar si es posible mejorar el modelo. .
+                    Por ello, se ha decidido utilizar el modelo XGBoost que hemos podido ver que ofrece unos buenos resultados, en combinación con un modelo de regresión logística y un modelo de _random forest_ para comprobar si es posible mejorar el modelo.
 
                     Para mejorar al máximo el rendimiento del modelo se han implementado los mismos hiperparámetros que en el modelo XGBoost:
                     - max_depth: Máxima profundidad del modelo ("ramas").
@@ -412,7 +437,7 @@ def screen_informe():
 
                     A continuación pueden revisarse las diferentes gráficas que suelen emplearse para determinar el ajuste del modelo.
                     """)
-            graph = st.selectbox("Gráficas", options = ["Matriz de confusión", "Curva ROC", "Overfitting"])
+            graph = st.selectbox("Gráficas", options = ["Matriz de confusión", "Curva ROC", "Overfitting", 'Variables más relevantes'])
             if graph == "Matriz de confusión":
                 generar_grafico_stack(graph)
                 st.markdown(f"""
@@ -462,6 +487,13 @@ def screen_informe():
 
                         Como puede verse en la gráfica de sobreajuste, para este modelo la tasa de acierto para el conjunto de entrenamiento y de prueba es muy similar, y, si calculamos el valor concreto del sobreajuste, encontramos que no llega a un 5% que es lo solicitado por el cliente. Además se muestra que se repite para los 5 conjuntos de validación cruzada.
                         """)
-                
+            if graph == 'Variables más relevantes':
+                generar_grafico_stack(graph)
+                st.markdown(f"""
+                            Este gráfico representa las variables que más peso tienen a la hora de determinar la probabilidad de pertenecer a la categoría de "satisfecho". 
+                            Al tratarsse de un modelo configurado mediante la técnica de stacking, no podemos obtener una única medida de la importancia de cada variable. Por tanto, mostramos en la gráfica los índices para dos de los modelos que configuran el stack, random forest y XGBoost. Se puede observar que muchas de las variables tienen el mismo orden en importancia, pero en algunos casos los modelos difieren en dicha medida.
+                            
+                            De esta forma puede verse como opera un modelo de Stack, combinando ambos modelos con sus diferencias para generar la mejor predicción posible con los datos disponibles.
+                            """)
             
 
