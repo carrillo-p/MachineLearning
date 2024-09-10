@@ -1,23 +1,30 @@
 import streamlit as st
 import pandas as pd
+from pantallas.aux_functions import predict_satisfaction, create_gauge_chart
+from src.Modelos.logistic_model import LogisticModel
+from src.Modelos.xgboost_model import XGBoostModel
 
-def home_screen():
-    st.markdown(f"""<h1 style="text-align: center;"> Bienvenido al Predictor de Satisfacción de Aerolíneas ✈️) </h1>""", unsage_allow_html = True)
-    st.markdown("""
-    ¡Hola! Bienvenido a nuestra aplicación de predicción de satisfacción de pasajeros de aerolíneas. 
-    Aquí podrás:
-    
-    - 🔮 Predecir la satisfacción de un pasajero basado en diferentes factores
-    - 📊 Ver los resultados detallados de nuestros modelos de predicción
-    - 💬 Dejar tu feedback y ver los comentarios de otros usuarios
-    - 🎮 Jugar un divertido juego de trivia sobre aviación
-    
-    ¡Explora las diferentes secciones y diviértete!
-    """)
+
+@st.cache_resource
+def load_models():
+    logistic_model = LogisticModel.load_model('src/Modelos/logistic_model.joblib')
+    xgboost_model = XGBoostModel.load_model('src/Modelos/xgboost_model.joblib')
+    return logistic_model, xgboost_model
+
+try:
+    logistic_model, xgboost_model = load_models()
+except Exception as e:
+    st.error(f"Error al cargar los modelos: {str(e)}")
+    st.stop()
+
+def predict_satisfaction(model, inputs):
+    proba = model.predict_proba(inputs)[0]
+    prediction = 1 if proba[1] > 0.5 else 0
+    return prediction, proba[1]
 
 def screen_predict():
-    st.markdown(f"""<h1 style="text-align: center;"> Predictor de Satisfacción </h1>""", unsage_allow_html = True)
-    st.markdown(f"""<h3 style="text-align: center;"> Ingrese los detalles del vuelo para predecir la satisfacción del cliente 😊</h3>""", unsage_allow_html = True)
+    st.markdown(f"""<h1 style="text-align: center;"> Predictor de Satisfacción </h1>""", unsafe_allow_html = True)
+    st.markdown(f"""<h3 style="text-align: center;"> Ingrese los detalles del vuelo para predecir la satisfacción del cliente 😊</h3>""", unsafe_allow_html = True)
 
     gender = st.selectbox("Género 👤", ["Male", "Female"])
     customer_type = st.selectbox("Tipo de Cliente 🧑‍💼", ["Loyal Customer", "disloyal Customer"])
@@ -94,3 +101,4 @@ def screen_predict():
             st.metric("Predicción", f"{'Satisfecho' if xgboost_pred == 1 else 'Insatisfecho'} {emoji}")
 
         st.balloons()
+
