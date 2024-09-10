@@ -67,6 +67,19 @@ def generar_grafico_log(tipo_grafico):
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
+    elif tipo_grafico == 'Variables más relevantes':
+        coefficients = log_model.model.coef_[0]
+        feature_names = X.columns
+
+        coef_df = pd.DataFrame({
+            'Feature': feature_names,
+            'Coefficient': coefficients
+            })
+        coef_df = coef_df.sort_values(by='Coefficient', ascending=False)
+        sns.barplot(x='Coefficient', y='Feature', data=coef_df)
+        plt.title('Coeficientes de las Variables en el Modelo de Regresión Logística')
+        plt.xlabel('Coeficiente')
+        plt.ylabel('Variable')
 
     plt.tight_layout()  # Ajustar el diseño
     st.pyplot(plt.gcf())
@@ -109,6 +122,22 @@ def generar_grafico_XGB(tipo_grafico):
         plt.xlabel('Number of Trees')
         plt.ylabel('Log Loss')
         plt.title('XGBoost Log Loss')
+
+    elif tipo_grafico == 'Variables más relevantes':
+        importance = xgb_model.model.feature_importances_
+        feature_names = X.columns
+
+        importance_df = pd.DataFrame({
+            'Feature': feature_names,
+            'Importance': importance
+            })
+        
+        importance_df = importance_df.sort_values(by='Importance', ascending=False)
+
+        sns.barplot(x='Importance', y='Feature', data=importance_df)
+        plt.title('Importancia de las Variables en el Modelo XGBoost')
+        plt.xlabel('Importancia')
+        plt.ylabel('Variable')
     
     plt.tight_layout()  # Ajustar el diseño
     st.pyplot(plt.gcf())
@@ -215,7 +244,7 @@ def screen_informe():
 
                     A continuación pueden revisarse las diferentes gráficas que suelen emplearse para determinar el ajuste del modelo.
                     """)
-        graph = st.selectbox("Gráficas", options = ["Matriz de confusión", "Curva ROC", "Overfitting"])
+        graph = st.selectbox("Gráficas", options = ["Matriz de confusión", "Curva ROC", "Overfitting", 'Variables más relevantes'])
         if graph == "Matriz de confusión":
              generar_grafico_XGB(graph)
              st.markdown(f"""
@@ -270,6 +299,11 @@ def screen_informe():
                         - Validación cruzada: {np.round(cv_scores, 2)}
                         - Media de las puntuaciones: {np.round(cv_scores.mean(), 2)}
                         """)
+        if graph == 'Variables más relevantes':
+            generar_grafico_XGB(graph)
+            st.markdown(f"""
+                    Este gráfico representa las variables que más peso tienen a la hora de determinar la probabilidad de pertenecer a la categoría de "satisfecho".
+                        """)
 
     if st.session_state['modelo_seleccionado'] == 'Logistic':
             y_pred = log_model.predict(X_test)
@@ -290,7 +324,7 @@ def screen_informe():
                         A continuación pueden revisarse las diferentes gráficas que suelen emplearse para determinar el ajuste del modelo.
 
                         """)
-            graph = st.selectbox("Gráficas", options = ["Matriz de confusión", "Curva ROC", "Overfitting"])
+            graph = st.selectbox("Gráficas", options = ["Matriz de confusión", "Curva ROC", "Overfitting", 'Variables más relevantes'])
             if graph == "Matriz de confusión":
                 generar_grafico_log(graph)
                 st.markdown(f"""
@@ -339,8 +373,11 @@ def screen_informe():
                             
                         Si calculamos el valor concreto del sobreajuste, encontramos que no llega a un 5% que es lo solicitado por el cliente. Se muestra que un mayor valor en la regularización mejora el acierto pero no modifica significativamente el sobreajuste del modelo.
                         """)
-                        
-
+            if graph == 'Variables más relevantes':
+                 generar_grafico_log(graph)
+                 st.markdown(f"""
+                            Este gráfico representa las variables que más peso tienen a la hora de determinar la probabilidad de pertenecer a la categoría de "satisfecho". Los coeficientes de regresión negativos indican aquellas categorías que reducen la probabilidad y los positivos las que la aumentan.
+                             """)
             
     if st.session_state['modelo_seleccionado'] == 'Stacked':
             stack_model = joblib.load('../Modelos/stack_model.joblib')
