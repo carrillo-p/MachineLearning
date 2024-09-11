@@ -1,4 +1,5 @@
 import pandas as pd
+import shap
 import streamlit as st
 import os
 import pandas as pd
@@ -262,7 +263,7 @@ def screen_informe():
             st.session_state['modelo_seleccionado'] = 'XGBoost'
     
     col1, col2 = st.columns(2)
-    
+
     with col1:
         if st.button("Modelo Stacked"):
             st.session_state['modelo_seleccionado'] = 'Stacked'
