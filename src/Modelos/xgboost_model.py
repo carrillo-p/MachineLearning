@@ -70,6 +70,8 @@ class XGBoostModel:
         )
 
     def train(self, X_train, y_train, X_test, y_test):
+        self.search_hyperparams(X_train, X_test, y_train, y_test)
+        self.init_model()
         eval_set = [(X_train, y_train), (X_test, y_test)]
         self.model.fit(X_train, y_train, eval_set=eval_set, verbose=False)
 
@@ -87,6 +89,8 @@ class XGBoostModel:
         return self.model.predict_proba(X)
 
     def cross_validate(self, X, y, cv=5):
+        if self.model is None:
+            raise ValueError("Model not trained. Call 'train' before cross-validating.")
         return cross_val_score(self.model, X, y, cv=cv)
 
     def roc_curve(self, X_test, y_test):

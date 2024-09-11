@@ -487,6 +487,7 @@ def screen_informe():
 
                         Como puede verse en la gráfica de sobreajuste, para este modelo la tasa de acierto para el conjunto de entrenamiento y de prueba es muy similar, y, si calculamos el valor concreto del sobreajuste, encontramos que no llega a un 5% que es lo solicitado por el cliente. Además se muestra que se repite para los 5 conjuntos de validación cruzada.
                         """)
+<<<<<<< HEAD
             if graph == 'Variables más relevantes':
                 generar_grafico_stack(graph)
                 st.markdown(f"""
@@ -497,3 +498,7 @@ def screen_informe():
                             """)
             
 
+=======
+                
+__all__ = ['screen_informe', 'generar_grafico_log', 'generar_grafico_XGB', 'generar_grafico_stack']    
+>>>>>>> 8dcbd8b (test modelos y streamlit + docker streamlit)
