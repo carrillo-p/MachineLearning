@@ -42,6 +42,9 @@ y = airline_df['satisfaction']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
+scaler = joblib.load('../Modelos/scaler.save') 
+
+X_test_scaled = scaler.transform(X_test)
 def generar_grafico_log(tipo_grafico):
 
     y_pred = log_model.predict(X_test)
@@ -229,6 +232,15 @@ def generar_grafico_neural(tipo_grafico):
         plt.legend()
         plt.show()
 
+    if tipo_grafico == 'Matriz de confusión':
+        y_pred_prob = neural_model.predict(X_test_scaled)
+        y_pred = (y_pred_prob > 0.5).astype("int32")
+        conf_matrix = confusion_matrix(y_test, y_pred)
+        sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=["Clase 0", "Clase 1"], yticklabels=["Clase 0", "Clase 1"])
+        plt.xlabel('Predicted Label')
+        plt.ylabel('True Label')
+        plt.title('Confusion Matrix')
+
     plt.tight_layout()  # Ajustar el diseño
     st.pyplot(plt.gcf())
 
@@ -240,7 +252,7 @@ def screen_informe():
     st.markdown(f"""<h1 style="text-align: center;"> Información acerca de los modelos </h1>""", unsafe_allow_html = True)
     st.markdown(f"""<h3 style="text-align: center;"> Seleccione el modelo en el que está interesado para una explicación detallada. </h3>""", unsafe_allow_html = True)
     
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2 = st.columns(2)
     
     with col1:
         if st.button("Modelo Logistico"):
@@ -248,11 +260,14 @@ def screen_informe():
     with col2:
         if st.button("Modelo XGBoost"):
             st.session_state['modelo_seleccionado'] = 'XGBoost'
-    with col3:
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
         if st.button("Modelo Stacked"):
             st.session_state['modelo_seleccionado'] = 'Stacked'
 
-    with col4:
+    with col2:
         if st.button("Modelo CNN"):
             st.session_state['modelo_seleccionado'] = 'CNN'
 
@@ -538,13 +553,16 @@ def screen_informe():
                         A continuación pueden revisarse las diferentes gráficas que suelen emplearse para determinar el ajuste del modelo.
 
                         """)
-            graph = st.selectbox("Gráficas", options = ["Loss function"])
+            graph = st.selectbox("Gráficas", options = ["Loss function", "Matriz de confusión"])
             if graph == "Loss function":
                 generar_grafico_neural(graph)
                 st.markdown(f"""
-                        #### Matriz de confusión
-
-                        La matriz de confusión nos permite evaluar el número de errores que comete el modelo en sus predicciones con el conjunto de prueba. Podemos dividir las predicciones en cuatro categorías:
+                        #### Loss function""")
+                
+            if graph == 'Matriz de confusión':
+                generar_grafico_neural(graph)
+                st.markdown(f"""
+                             La matriz de confusión nos permite evaluar el número de errores que comete el modelo en sus predicciones con el conjunto de prueba. Podemos dividir las predicciones en cuatro categorías:
                         - True Positives: En nuestro caso cuando el modelo acierta que el cliente quedó satisfecho. Cuadrante inferior derecho.
                         - True Negatives: En nuestro caso cuando el modelo acierta que el cliente quedó insatisfecho. Cuadrante superior izquierdo.
                         - False Positive: El modelo predice un cliente satisfecho cuando está insatisfecho. Cuadrante superior derecho.
@@ -562,6 +580,7 @@ def screen_informe():
                         - Recall: Neutral o no satisfecho = 0.91 / Satisfecho = 0.83
                         - F1-score: Neutral o no satisfecho = 0.89 / Satisfecho = 0.85
 
-                        Todos los valores obtenidos muestran valores por encima del 0.80, demostrando un buen ajuste del modelo.""")
+                        Todos los valores obtenidos muestran valores por encima del 0.80, demostrando un buen ajuste del modelo.
+                            """)
                 
 __all__ = ['screen_informe', 'generar_grafico_log', 'generar_grafico_XGB', 'generar_grafico_stack']    
