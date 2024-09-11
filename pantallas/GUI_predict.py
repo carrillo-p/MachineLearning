@@ -1,6 +1,9 @@
+import joblib
 import streamlit as st
 import pandas as pd
 from pantallas.aux_functions import predict_satisfaction, create_gauge_chart
+import tensorflow as tf
+from tensorflow import keras
 from src.Modelos.logistic_model import LogisticModel
 from src.Modelos.xgboost_model import XGBoostModel
 from src.Modelos.stack_model import StackModel
@@ -18,6 +21,9 @@ try:
 except Exception as e:
     st.error(f"Error al cargar los modelos: {str(e)}")
     st.stop()
+
+neural_model = tf.keras.models.load_model('src/Modelos/neuronal.keras')
+scaler = joblib.load('src/Modelos/scaler.save') 
 
 def predict_satisfaction(model, inputs):
     proba = model.predict_proba(inputs)[0]
@@ -103,12 +109,25 @@ def screen_predict():
             emoji = "😃" if xgboost_pred == 1 else "😞"
             st.metric("Predicción", f"{'Satisfecho' if xgboost_pred == 1 else 'Insatisfecho'} {emoji}")
         
-    
-        st.markdown("<h3 style='text-align: center;'>Modelo Stacked</h3>", unsafe_allow_html=True)
-        fig_stack = create_gauge_chart(stack_prob * 100, "Probabilidad de Satisfacción")
-        st.plotly_chart(fig_stack, use_container_width=True)
-        emoji = "😃" if stack_pred == 1 else "😞"
-        st.metric("Predicción", f"{'Satisfecho' if stack_pred == 1 else 'Insatisfecho'} {emoji}")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.markdown("<h3 style='text-align: center;'>Modelo Stacked 📚</h3>", unsafe_allow_html=True)
+            fig_stack = create_gauge_chart(stack_prob * 100, "Probabilidad de Satisfacción")
+            st.plotly_chart(fig_stack, use_container_width=True)
+            emoji = "😃" if stack_pred == 1 else "😞"
+            st.metric("Predicción", f"{'Satisfecho' if stack_pred == 1 else 'Insatisfecho'} {emoji}")
+        
+        with col2:
+            st.markdown("<h3 style='text-align: center;'>CNN 🧠</h3>", unsafe_allow_html=True)
+            inputs_scaled = scaler.transform(inputs)
+            neural_prob = neural_model.predict(inputs_scaled)
+            neural_prob = float(neural_prob[0, 0])
+            neural_pred = 1 if neural_prob > 0.5 else 0
+            fig_stack = create_gauge_chart(neural_prob * 100, "Probabilidad de Satisfacción")
+            st.plotly_chart(fig_stack, use_container_width=True)
+            emoji = "😃" if neural_pred == 1 else "😞"
+            st.metric("Predicción", f"{'Satisfecho' if stack_pred == 1 else 'Insatisfecho'} {emoji}")
 
         st.balloons()
 
