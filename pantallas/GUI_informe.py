@@ -1,5 +1,4 @@
 import pandas as pd
-import shap
 import streamlit as st
 import os
 import pandas as pd
@@ -539,26 +538,39 @@ def screen_informe():
             
     if st.session_state['modelo_seleccionado'] == 'CNN':
             st.markdown("""
-                        La regresión logística es un tipo es un tipo de modelo líneal que analiza la relación entre una variable dependiente binaria (0 - 1) y una  o más variables independientes (las cuales pueden ser de diferentes tipos). 
+                        El modelo de clasificación con red neuronal es un algoritmo de aprendizaje supervisado al igual que los anteriores que se han explicado. Su estructura no obstante es distinta.
 
-                        Este tipo de modelo extrae los coeficientes de regresión de las variables independientes para predecir la probabilidad (en _odds_ o en Probabilidad) de pertenecer a la categoría 1 (en este caso la probabilidad de estar satisfecho con el vuelo). Por tanto es un buen modelo para trabajar con machine learning en problemas de clasificación binaria con aprendizaje supervisado.
+                        Estos modelos de forma general constan de una capa de entrada, una capa de salida, y una serie de capas intermedias que procesan los datos para hacer las predicciones.
 
-                        Su principal ventaja es que es un modelo facil de implementar y de interpretar, en especial en machine learning donde no tenemos que trabajar con métricas logit. Es especialmente relevante en conjuntos de datos que son linealmente separables, además, permite ver el peso de las diferentes variables gracias a sus coeficientes de regresión, permitiendo además ver su dirección (si aumentan o disminuyen la probabilidad de que el cliente esté satisfecho).
+                        Al igual que en los modelos de ML se divide el conjunto de datos en datos de entrenamiento y de prueba. Estos modelos además se entrenan por "epocas", iteraciones secuenciales de entrenamiento del conjunto de entrenamietno. Se pueden fijar en el valor necesario, en este caso se ha optado por 100.
 
-                        Permite la inclusión de hiperparámteros para mejorar su rendimiento. En este caso se ha optado por utilizar regularización, el cual penaliza modelos complejos para evitar que se de sobreajuste en el modelo.
+                        Estas capas están compuestas por nodos o "neuronas", la elección de cuantas neuronas componen cada capa no tiene una referencia teórica como tal, en algunos casos modelos complejos pueden provocar problemas de sobreajuste, pero modelos muy simplistas pueden no aportar una buena tasa de acierto.
 
-                        Se ha utilizado también validación cruzada para asegurar en la medida de lo posible que el modelo no presenta overfitting, con 5 muestras cruzadas.
+                        En este caso se ha optado por una capa de entrada de 64 neuronas, y tres capas ocultas de 32, 16 y 8 neuronas. La capa de salida es una capa de función sigmoide que clasifica la salida en 0 y 1, tal y como tenemos definidas las categorías de interés.
 
-                        ### Evaluación del modelo
+                        Para evitar cuestiones de sobreajuste se han empleado una serie de hiperparámetros. Al igual que la decisión de la estructura de la red, la decisión de los valores no tiene una base teórica per se, aunque pueden darse como referencia algunos valores. En general se trata de un trabajo de ensayo y error hasta dar con el mejor modelo.
 
-                        A continuación pueden revisarse las diferentes gráficas que suelen emplearse para determinar el ajuste del modelo.
+                        Los hiperparámteros usados han sido:
+
+                        - Regularización L2: En todas las capas excepto en la de salida. Esta regularización penaliza los pesos altos para evitar que el modelo se ajuste en exceso al conjunto de datos de entrenamiento.
+                        - Dropout: Este parámetro provoca que un porcentaje de las neuronas de la capa previa se apaguen aleatoriamente en cada "época" de entrenamiento, de esta forma se evita que la red se acostumbre demasiado a los datos de entrenamiento y no pueda generalizar correctamente. Se ha establecido un valor de 0.2, que implica un 20%, se recomiendan valores entre 0.2 y 0.5.
+                        - Adam learning rate: Algoritmo de tasa de aprendizaje, se ha fijado en 0.00098 tras ensayo y error, evita el sobreajuste del modelo y favorece el acierto. Los valores de inicio y de prueba dependen del usuario aunque se recomiendan valores de 0.01 para empezar y reducir en 0.00001 cada prueba.
+
+                        Los valores de acierto y ajuste pueden verse en los gráficos a continuación.
 
                         """)
             graph = st.selectbox("Gráficas", options = ["Loss function", "Matriz de confusión"])
             if graph == "Loss function":
                 generar_grafico_neural(graph)
                 st.markdown(f"""
-                        #### Loss function""")
+                            #### Loss function
+                            La función de pérdida nos sirve para evaluar el ajuste del modelo y analizar si existe overfitting.
+
+                            En líneas generales diremos que hay overfiitng cuando el valor de pérdida del conjunto de entrenamiento sea mucho menor que el del conjunto de test.
+
+                            En este caso vemos que el valor de pérdida de entrenamiento es algo menor que el de test, pero se trata de una diferencia tan baja que podemos asumir que no ha habido sobreajuste en el modelo.
+                            """)
+
                 
             if graph == 'Matriz de confusión':
                 generar_grafico_neural(graph)
@@ -573,15 +585,16 @@ def screen_informe():
 
                         Podemos operativizarlo de manera numérica calculando la precisión, calculada con estos valores numéricos.
 
-
                         Podemos analizar también los valores del reporte de clasificación, donde se incluyen las medidas de exhaustividad (_recall_), proporción de verdaderos positivos entre los casos positivos (TP+NP), y el F1-score, media armónica de la precisión y la exhaustividad.
 
                         Reporte de clasificación: 
 
-                        - Recall: Neutral o no satisfecho = 0.91 / Satisfecho = 0.83
-                        - F1-score: Neutral o no satisfecho = 0.89 / Satisfecho = 0.85
+                        - Recall: Neutral o no satisfecho = 0.98 / Satisfecho = 0.94
+                        - F1-score: Neutral o no satisfecho = 0.97 / Satisfecho = 0.96
 
-                        Todos los valores obtenidos muestran valores por encima del 0.80, demostrando un buen ajuste del modelo.
+                        Todos los valores obtenidos muestran valores por encima del 0.94, demostrando un buen ajuste del modelo.
+                            
+                        La tasa de acierto del modelo en general es de 0.96.
                             """)
                 
 __all__ = ['screen_informe', 'generar_grafico_log', 'generar_grafico_XGB', 'generar_grafico_stack']    
