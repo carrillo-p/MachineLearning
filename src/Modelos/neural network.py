@@ -46,3 +46,7 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy']
 history = model.fit(X_train, y_train, epochs=100, validation_split = 0.2)
 
 model.save('../Modelos/neuronal.keras')
+
+import pickle
+with open('../Modelos/history.pkl', 'wb') as file:
+    pickle.dump(history.history, file)

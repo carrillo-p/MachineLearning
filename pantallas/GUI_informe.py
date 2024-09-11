@@ -2,9 +2,12 @@ import pandas as pd
 import streamlit as st
 import os
 import pandas as pd
+import tensorflow as tf
 import joblib
+import pickle
 import seaborn as sns
 import matplotlib.pyplot as plt
+from tensorflow import keras
 from src.Modelos.logistic_model import LogisticModel
 from src.Modelos.xgboost_model import XGBoostModel
 from src.Modelos.stack_model import StackModel
@@ -21,6 +24,7 @@ def load_models():
 
 try:
     log_model, xgb_model, stack_model = load_models()
+    neural_model = tf.keras.models.load_model('src/Modelos/neuronal.keras')
 except Exception as e:
     st.error(f"Error al cargar los modelos: {str(e)}")
     st.stop()
@@ -213,6 +217,21 @@ def generar_grafico_stack(tipo_grafico):
     plt.tight_layout()  # Ajustar el diseño
     st.pyplot(plt.gcf())
 
+def generar_grafico_neural(tipo_grafico):
+    if tipo_grafico == 'Loss function':
+        with open('../Modelos/history.pkl', 'rb') as file:
+            history = pickle.load(file)
+        plt.plot(history['loss'], label='Training Loss')
+        plt.plot(history['val_loss'], label='Validation Loss')  # Si se usa validación
+        plt.title('Evolución del Loss durante el Entrenamiento')
+        plt.xlabel('Épocas')
+        plt.ylabel('Pérdida (Loss)')
+        plt.legend()
+        plt.show()
+
+    plt.tight_layout()  # Ajustar el diseño
+    st.pyplot(plt.gcf())
+
 def screen_informe():
 
     if 'modelo_seleccionado' not in st.session_state:
@@ -221,7 +240,7 @@ def screen_informe():
     st.markdown(f"""<h1 style="text-align: center;"> Información acerca de los modelos </h1>""", unsafe_allow_html = True)
     st.markdown(f"""<h3 style="text-align: center;"> Seleccione el modelo en el que está interesado para una explicación detallada. </h3>""", unsafe_allow_html = True)
     
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         if st.button("Modelo Logistico"):
@@ -232,6 +251,10 @@ def screen_informe():
     with col3:
         if st.button("Modelo Stacked"):
             st.session_state['modelo_seleccionado'] = 'Stacked'
+
+    with col4:
+        if st.button("Modelo CNN"):
+            st.session_state['modelo_seleccionado'] = 'CNN'
 
     if st.session_state['modelo_seleccionado'] == 'XGBoost':
         xgb_model = joblib.load('../Modelos/xgboost_model.joblib')
@@ -495,7 +518,50 @@ def screen_informe():
                             
                             De esta forma puede verse como opera un modelo de Stack, combinando ambos modelos con sus diferencias para generar la mejor predicción posible con los datos disponibles.
                             """)
+                
+        
             
+    if st.session_state['modelo_seleccionado'] == 'CNN':
+            st.markdown("""
+                        La regresión logística es un tipo es un tipo de modelo líneal que analiza la relación entre una variable dependiente binaria (0 - 1) y una  o más variables independientes (las cuales pueden ser de diferentes tipos). 
 
+                        Este tipo de modelo extrae los coeficientes de regresión de las variables independientes para predecir la probabilidad (en _odds_ o en Probabilidad) de pertenecer a la categoría 1 (en este caso la probabilidad de estar satisfecho con el vuelo). Por tanto es un buen modelo para trabajar con machine learning en problemas de clasificación binaria con aprendizaje supervisado.
+
+                        Su principal ventaja es que es un modelo facil de implementar y de interpretar, en especial en machine learning donde no tenemos que trabajar con métricas logit. Es especialmente relevante en conjuntos de datos que son linealmente separables, además, permite ver el peso de las diferentes variables gracias a sus coeficientes de regresión, permitiendo además ver su dirección (si aumentan o disminuyen la probabilidad de que el cliente esté satisfecho).
+
+                        Permite la inclusión de hiperparámteros para mejorar su rendimiento. En este caso se ha optado por utilizar regularización, el cual penaliza modelos complejos para evitar que se de sobreajuste en el modelo.
+
+                        Se ha utilizado también validación cruzada para asegurar en la medida de lo posible que el modelo no presenta overfitting, con 5 muestras cruzadas.
+
+                        ### Evaluación del modelo
+
+                        A continuación pueden revisarse las diferentes gráficas que suelen emplearse para determinar el ajuste del modelo.
+
+                        """)
+            graph = st.selectbox("Gráficas", options = ["Loss function"])
+            if graph == "Loss function":
+                generar_grafico_neural(graph)
+                st.markdown(f"""
+                        #### Matriz de confusión
+
+                        La matriz de confusión nos permite evaluar el número de errores que comete el modelo en sus predicciones con el conjunto de prueba. Podemos dividir las predicciones en cuatro categorías:
+                        - True Positives: En nuestro caso cuando el modelo acierta que el cliente quedó satisfecho. Cuadrante inferior derecho.
+                        - True Negatives: En nuestro caso cuando el modelo acierta que el cliente quedó insatisfecho. Cuadrante superior izquierdo.
+                        - False Positive: El modelo predice un cliente satisfecho cuando está insatisfecho. Cuadrante superior derecho.
+                        - False Negatives: El modelo predice un cliente insatisfecho cuando está satisfecho. Cuadrante inferior izquierdo.
+
+                        Como puede verse en la gráfica, el modelo presenta un número alto de TP y TN, lo cual indica un buen ajuste del modelo. 
+
+                        Podemos operativizarlo de manera numérica calculando la precisión, calculada con estos valores numéricos.
+
+
+                        Podemos analizar también los valores del reporte de clasificación, donde se incluyen las medidas de exhaustividad (_recall_), proporción de verdaderos positivos entre los casos positivos (TP+NP), y el F1-score, media armónica de la precisión y la exhaustividad.
+
+                        Reporte de clasificación: 
+
+                        - Recall: Neutral o no satisfecho = 0.91 / Satisfecho = 0.83
+                        - F1-score: Neutral o no satisfecho = 0.89 / Satisfecho = 0.85
+
+                        Todos los valores obtenidos muestran valores por encima del 0.80, demostrando un buen ajuste del modelo.""")
                 
 __all__ = ['screen_informe', 'generar_grafico_log', 'generar_grafico_XGB', 'generar_grafico_stack']    
