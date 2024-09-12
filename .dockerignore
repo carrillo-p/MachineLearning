@@ -1,0 +1,64 @@
+# Archivos y directorios de Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Entornos virtuales
+venv
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Archivos de IDEs y editores
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Otros
+*.md
+LICENSE
+*.gitignore
+
+# Directorios específicos del proyecto (ajusta según sea necesario)
+tests/
+docs/
+
+# Archivos de datos (ajusta según sea necesario)
+*.csv
+*.json
+*.pkl
+
+# Archivos de configuración local
+.env
+*.cfg
