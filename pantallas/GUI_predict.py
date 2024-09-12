@@ -149,10 +149,10 @@ def screen_predict():
             # Guardar predicciones en la base de datos
             save_prediction(
                 inputs, 
-                logistic_pred, round(logistic_prob, 2), 
-                xgboost_pred, round(xgboost_prob, 2),
-                stack_pred, round(stack_prob, 2), 
-                neural_pred, round(neural_prob, 2)  
+                logistic_pred, logistic_prob, 
+                xgboost_pred, xgboost_prob,
+                stack_pred, stack_prob, 
+                neural_pred, neural_prob
             )
 
         
