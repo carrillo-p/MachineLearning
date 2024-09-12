@@ -7,6 +7,10 @@ from tensorflow import keras
 from src.Modelos.logistic_model import LogisticModel
 from src.Modelos.xgboost_model import XGBoostModel
 from src.Modelos.stack_model import StackModel
+import mysql.connector
+from src.database.connection import create_connection, close_connection
+import datetime
+import numpy as np
 
 
 @st.cache_resource
@@ -29,6 +33,49 @@ def predict_satisfaction(model, inputs):
     proba = model.predict_proba(inputs)[0]
     prediction = 1 if proba[1] > 0.5 else 0
     return prediction, proba[1]
+
+# Función para guardar predicción en la base de datos
+def save_prediction(inputs, logistic_pred, logistic_prob, xgboost_pred, xgboost_prob, stacked_pred, stacked_prob):
+
+    connection = create_connection()
+    cursor = connection.cursor()
+    
+    query = """
+    INSERT INTO predictions (
+        logistic_prediction, logistic_probability, 
+        xgboost_prediction, xgboost_probability,
+        stacked_prediction, stacked_probability,
+        gender, customer_type, age, travel_type, flight_class,
+        flight_distance, inflight_wifi, departure_convenience, online_booking, gate_location, food_drink, 
+        online_boarding, seat_comfort, inflight_entertainment, onboard_service, legroom_service, 
+        baggage_handling, checkin_service, inflight_service_personal, cleanliness, 
+        departure_delay, arrival_delay
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    
+    values = (
+        logistic_pred, logistic_prob,  
+        xgboost_pred, xgboost_prob,
+        stacked_pred, stacked_prob, 
+        inputs['Gender'].values[0], inputs['Customer Type'].values[0], inputs['Age'].values[0],
+        inputs['Type of Travel'].values[0], inputs['Class'].values[0],
+        inputs['Flight Distance'].values[0], inputs['Inflight wifi service'].values[0],
+        inputs['Departure/Arrival time convenient'].values[0], inputs['Ease of Online booking'].values[0],
+        inputs['Gate location'].values[0], inputs['Food and drink'].values[0], inputs['Online boarding'].values[0],
+        inputs['Seat comfort'].values[0], inputs['Inflight entertainment'].values[0], inputs['On-board service'].values[0],
+        inputs['Leg room service'].values[0], inputs['Baggage handling'].values[0], inputs['Checkin service'].values[0],
+        inputs['Inflight service'].values[0], inputs['Cleanliness'].values[0], inputs['Departure Delay in Minutes'].values[0],
+        inputs['Arrival Delay in Minutes'].values[0]
+    )
+    
+    # Convertir todos los valores a tipos nativos de Python
+    values = tuple(map(lambda x: int(x) if isinstance(x, (np.int64, np.float64, np.float32)) else x, values))
+
+    cursor.execute(query, values)
+
+    connection.commit()
+    close_connection(connection)
 
 def screen_predict():
     st.markdown(f"""<h1 style="text-align: center;"> Predictor de Satisfacción </h1>""", unsafe_allow_html = True)
@@ -90,6 +137,14 @@ def screen_predict():
             logistic_pred, logistic_prob = predict_satisfaction(logistic_model, inputs)
             xgboost_pred, xgboost_prob = predict_satisfaction(xgboost_model, inputs)
             stack_pred, stack_prob = predict_satisfaction(stack_model, inputs)
+
+            # Guardar predicciones en la base de datos
+            save_prediction(
+                inputs, 
+                logistic_pred, round(logistic_prob, 2), 
+                xgboost_pred, round(xgboost_prob, 2),
+                stack_pred, round(stack_prob, 2),      
+            )
         
         # Mostrar resultados
         st.subheader("Resultados de la Predicción 📊")
