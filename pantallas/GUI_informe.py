@@ -63,6 +63,8 @@ def generar_grafico_log(tipo_grafico):
         plt.xlabel('Predicción')
         plt.ylabel('Valor Real')
         plt.title('Matriz de confusión')
+        plt.tight_layout()  # Ajustar el diseño
+        st.pyplot(plt.gcf())
     elif tipo_grafico == "Curva ROC":
         fpr, tpr, thresholds = roc_curve(y_test, y_prob)
         roc_auc = auc(fpr,tpr)
@@ -75,10 +77,10 @@ def generar_grafico_log(tipo_grafico):
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
-    elif tipo_grafico == 'Overfitting':
-        grafico = st.fill_uploader('output.png')
-        image = Image.open(grafico)
-        st.image(image, use_column_width=True)
+        plt.tight_layout()  # Ajustar el diseño
+        st.pyplot(plt.gcf())
+    elif tipo_grafico == "Overfitting":
+        st.image('output.png', use_column_width=True)
     elif tipo_grafico == 'Variables más relevantes':
         coefficients = log_model.model.coef_[0]
         feature_names = X.columns
@@ -92,9 +94,8 @@ def generar_grafico_log(tipo_grafico):
         plt.title('Coeficientes de las Variables en el Modelo de Regresión Logística')
         plt.xlabel('Coeficiente')
         plt.ylabel('Variable')
-
-    plt.tight_layout()  # Ajustar el diseño
-    st.pyplot(plt.gcf())
+        plt.tight_layout()  # Ajustar el diseño
+        st.pyplot(plt.gcf())
             
 
 def generar_grafico_XGB(tipo_grafico):
@@ -434,6 +435,7 @@ def screen_informe():
                         En este caso atendiendo tanto a la gráfica, como al alto valor AUC (0.92). Podemos concluir que el modelo está discriminando de forma muy eficiente los casos de satisfacción.
                             """)
             if graph == "Overfitting":
+                generar_grafico_log(graph)
                 st.markdown(f"""
                         #### Sobreajuste (Overfitting)
 
