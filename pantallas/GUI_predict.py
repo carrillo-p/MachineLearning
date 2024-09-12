@@ -35,7 +35,7 @@ def predict_satisfaction(model, inputs):
     return prediction, proba[1]
 
 # Función para guardar predicción en la base de datos
-def save_prediction(inputs, logistic_pred, logistic_prob, xgboost_pred, xgboost_prob, stacked_pred, stacked_prob):
+def save_prediction(inputs, logistic_pred, logistic_prob, xgboost_pred, xgboost_prob, stacked_pred, stacked_prob, neural_pred, neural_prob):
 
     connection = create_connection()
     cursor = connection.cursor()
@@ -45,19 +45,21 @@ def save_prediction(inputs, logistic_pred, logistic_prob, xgboost_pred, xgboost_
         logistic_prediction, logistic_probability, 
         xgboost_prediction, xgboost_probability,
         stacked_prediction, stacked_probability,
+        neural_prediction, neural_probability,  
         gender, customer_type, age, travel_type, flight_class,
         flight_distance, inflight_wifi, departure_convenience, online_booking, gate_location, food_drink, 
         online_boarding, seat_comfort, inflight_entertainment, onboard_service, legroom_service, 
         baggage_handling, checkin_service, inflight_service_personal, cleanliness, 
         departure_delay, arrival_delay
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     
     values = (
         logistic_pred, logistic_prob,  
         xgboost_pred, xgboost_prob,
         stacked_pred, stacked_prob, 
+        neural_pred, neural_prob, 
         inputs['Gender'].values[0], inputs['Customer Type'].values[0], inputs['Age'].values[0],
         inputs['Type of Travel'].values[0], inputs['Class'].values[0],
         inputs['Flight Distance'].values[0], inputs['Inflight wifi service'].values[0],
@@ -137,14 +139,22 @@ def screen_predict():
             logistic_pred, logistic_prob = predict_satisfaction(logistic_model, inputs)
             xgboost_pred, xgboost_prob = predict_satisfaction(xgboost_model, inputs)
             stack_pred, stack_prob = predict_satisfaction(stack_model, inputs)
+            
+            # Predicción del modelo neuronal
+            inputs_scaled = scaler.transform(inputs)
+            neural_prob = neural_model.predict(inputs_scaled)
+            neural_prob = float(neural_prob[0, 0])
+            neural_pred = 1 if neural_prob > 0.5 else 0
 
             # Guardar predicciones en la base de datos
             save_prediction(
                 inputs, 
                 logistic_pred, round(logistic_prob, 2), 
                 xgboost_pred, round(xgboost_prob, 2),
-                stack_pred, round(stack_prob, 2),      
+                stack_pred, round(stack_prob, 2), 
+                neural_pred, round(neural_prob, 2)  
             )
+
         
         # Mostrar resultados
         st.subheader("Resultados de la Predicción 📊")
