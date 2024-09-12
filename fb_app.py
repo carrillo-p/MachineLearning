@@ -6,6 +6,8 @@ from tensorflow import keras
 import csv
 from datetime import datetime
 import os
+from src.database.connection import create_connection, close_connection
+import numpy as np
 
 # Configuración para suprimir advertencias de TensorFlow
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
@@ -69,6 +71,54 @@ def save_to_csv(data, predictions, feedback):
             predictions['Modelo4'],
             feedback['Modelo4']
         ])
+
+def save_to_database(data, predictions, feedback):
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    # Convert numpy types to Python native types
+    def convert_to_python_type(value):
+        if isinstance(value, (np.int64, np.int32)):
+            return int(value)
+        elif isinstance(value, (np.float64, np.float32)):
+            return float(value)
+        elif isinstance(value, np.bool_):
+            return bool(value)
+        return value
+
+    # Convert all values in data, predictions, and feedback
+    data = {k: convert_to_python_type(v) for k, v in data.items()}
+    predictions = {k: convert_to_python_type(v) for k, v in predictions.items()}
+    feedback = {k: convert_to_python_type(v) for k, v in feedback.items()}
+
+    # Prepare the query
+    query = """
+    INSERT INTO new_data (
+        gender, customer_type, age, travel_type, flight_class, flight_distance,
+        inflight_wifi, departure_convenience, online_booking, gate_location,
+        food_drink, online_boarding, seat_comfort, inflight_entertainment, onboard_service,
+        legroom_service, baggage_handling, checkin_service, inflight_service_personal,
+        cleanliness, departure_delay, arrival_delay,
+        xgboost_prediction, logistic_prediction, stacked_prediction, neural_prediction,
+        feedback_model1, feedback_model2, feedback_model3, feedback_model4
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+
+    # Prepare the values
+    values = (
+        data['Gender'], data['Customer Type'], data['Age'], data['Type of Travel'], data['Class'], data['Flight Distance'],
+        data['Inflight wifi service'], data['Departure/Arrival time convenient'], data['Ease of Online booking'], data['Gate location'],
+        data['Food and drink'], data['Online boarding'], data['Seat comfort'], data['Inflight entertainment'], data['On-board service'],
+        data['Leg room service'], data['Baggage handling'], data['Checkin service'], data['Inflight service'],
+        data['Cleanliness'], data['Departure Delay in Minutes'], data['Arrival Delay in Minutes'],
+        predictions['Modelo1'], predictions['Modelo2'], predictions['Modelo3'], predictions['Modelo4'],
+        feedback['Modelo1'], feedback['Modelo2'], feedback['Modelo3'], feedback['Modelo4']
+    )
+
+    cursor.execute(query, values)
+    connection.commit()
+    close_connection(connection)
 
 # Crear la aplicación Streamlit
 st.title('Encuesta de Satisfacción')
@@ -219,7 +269,10 @@ if st.session_state.results_shown:
             feedback = dict(zip(edited_df['Modelo'], (edited_df['Feedback'] == 'Sí').astype(int)))
             
             # Guardar en CSV
-            save_to_csv(st.session_state.data, st.session_state.predictions, feedback)
+            save_to_csv(st.session_state.data, st.session_state.predictions, feedback)        
+
+            # Guardar en base de datos
+            save_to_database(st.session_state.data, st.session_state.predictions, feedback)
             
             # Reiniciar las variables de estado
             st.session_state.results_shown = False
