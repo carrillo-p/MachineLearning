@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_NAME=airline_satisfaction
+    volumes:
+      - ./src:/app/src
+      - ./pantallas:/app/pantallas
+      - ./GUI.py:/app/GUI.py
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: airline_satisfaction
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
