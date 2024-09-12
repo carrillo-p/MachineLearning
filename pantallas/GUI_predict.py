@@ -102,7 +102,7 @@ def screen_predict():
     baggage_handling = st.slider("Manejo de equipaje 🧳", 1, 5, 3)
     checkin_service = st.slider("Servicio de check-in ✅", 1, 5, 3)
     inflight_service = st.slider("Servicio en vuelo 🛎️", 1, 5, 3)
-    cleanliness = st.slider("Limpieza 🧼", 10, 5, 3)
+    cleanliness = st.slider("Limpieza 🧼", 1, 5, 3)
     departure_delay = st.number_input("Retraso en la salida (minutos) ⏱️", min_value=0, value=0)
     arrival_delay = st.number_input("Retraso en la llegada (minutos) ⏱️", min_value=0, value=0)
 
