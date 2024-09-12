@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 def home_screen():
-    st.markdown(f"""<h1 style="text-align: center;"> Bienvenido al Predictor de Satisfacción de Aerolíneas ✈️) </h1>""", unsafe_allow_html = True)
+    st.markdown(f"""<h1 style="text-align: center;"> Bienvenido al Predictor de Satisfacción de Aerolíneas ✈️</h1>""", unsafe_allow_html = True)
     st.markdown("""
     ¡Hola! Bienvenido a nuestra aplicación de predicción de satisfacción de pasajeros de aerolíneas. 
     Aquí podrás:

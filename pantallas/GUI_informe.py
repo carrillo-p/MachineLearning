@@ -7,6 +7,7 @@ import joblib
 import pickle
 import seaborn as sns
 import matplotlib.pyplot as plt
+from PIL import Image
 from tensorflow import keras
 from src.Modelos.logistic_model import LogisticModel
 from src.Modelos.xgboost_model import XGBoostModel
@@ -74,6 +75,10 @@ def generar_grafico_log(tipo_grafico):
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
+    elif tipo_grafico == 'Overfitting':
+        grafico = st.fill_uploader('output.png')
+        image = Image.open(grafico)
+        st.image(image, use_column_width=True)
     elif tipo_grafico == 'Variables más relevantes':
         coefficients = log_model.model.coef_[0]
         feature_names = X.columns
@@ -372,13 +377,13 @@ def screen_informe():
             y_pred = log_model.predict(X_test)
             accuracy = accuracy_score(y_test, y_pred)
             st.markdown("""
-                        La regresión logística es un tipo es un tipo de modelo líneal que analiza la relación entre una variable dependiente binaria (0 - 1) y una  o más variables independientes (las cuales pueden ser de diferentes tipos). 
+                        La regresión logística es un tipo es un tipo de modelo lineal que analiza la relación entre una variable dependiente binaria (0 - 1) y una  o más variables independientes (las cuales pueden ser de diferentes tipos). 
 
                         Este tipo de modelo extrae los coeficientes de regresión de las variables independientes para predecir la probabilidad (en _odds_ o en Probabilidad) de pertenecer a la categoría 1 (en este caso la probabilidad de estar satisfecho con el vuelo). Por tanto es un buen modelo para trabajar con machine learning en problemas de clasificación binaria con aprendizaje supervisado.
 
-                        Su principal ventaja es que es un modelo facil de implementar y de interpretar, en especial en machine learning donde no tenemos que trabajar con métricas logit. Es especialmente relevante en conjuntos de datos que son linealmente separables, además, permite ver el peso de las diferentes variables gracias a sus coeficientes de regresión, permitiendo además ver su dirección (si aumentan o disminuyen la probabilidad de que el cliente esté satisfecho).
+                        Su principal ventaja es que es un modelo fácil de implementar y de interpretar, en especial en machine learning donde no tenemos que trabajar con métricas logit. Es especialmente relevante en conjuntos de datos que son linealmente separables, además, permite ver el peso de las diferentes variables gracias a sus coeficientes de regresión, permitiendo además ver su dirección (si aumentan o disminuyen la probabilidad de que el cliente esté satisfecho).
 
-                        Permite la inclusión de hiperparámteros para mejorar su rendimiento. En este caso se ha optado por utilizar regularización, el cual penaliza modelos complejos para evitar que se de sobreajuste en el modelo.
+                        Permite la inclusión de hiperparámetros para mejorar su rendimiento. En este caso se ha optado por utilizar regularización, el cual penaliza modelos complejos para evitar que se de sobreajuste en el modelo.
 
                         Se ha utilizado también validación cruzada para asegurar en la medida de lo posible que el modelo no presenta overfitting, con 5 muestras cruzadas.
 

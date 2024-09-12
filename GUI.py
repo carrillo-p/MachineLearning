@@ -4,6 +4,7 @@ from pantallas.GUI_home import home_screen
 from pantallas.GUI_predict import screen_predict
 from pantallas.GUI_informe import screen_informe
 from pantallas.GUI_feedback import screen_feedback
+from pantallas.GUI_resultados import screen_results
 from pantallas.GUI_trivia import screen_trivia
 
 if 'screen' not in st.session_state:
@@ -83,6 +84,8 @@ if st.sidebar.button("Predicción de Satisfacción"):
     change_screen("predict")
 if st.sidebar.button("Informe de Modelos"):
     change_screen("informe")
+if st.sidebar.button("Informe de Resultados"):
+    change_screen("results")
 if st.sidebar.button("Feedback"):
     change_screen("feedback")
 if st.sidebar.button("Juego de trivia"):
@@ -94,6 +97,8 @@ elif st.session_state.screen == 'predict':
     screen_predict()
 elif st.session_state.screen == 'informe':
     screen_informe()
+elif st.session_state.screen =='results':
+    screen_results()
 elif st.session_state.screen == 'feedback':
     screen_feedback()
 elif st.session_state.screen == 'trivia':
