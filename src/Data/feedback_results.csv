@@ -1,2 +1,3 @@
 Timestamp,Gender,Customer Type,Age,Type of Travel,Class,Flight Distance,Inflight wifi service,Departure/Arrival time convenient,Ease of Online booking,Gate location,Food and drink,Online boarding,Seat comfort,Inflight entertainment,On-board service,Leg room service,Baggage handling,Checkin service,Inflight service,Cleanliness,Departure Delay in Minutes,Arrival Delay in Minutes,XGBoost_pred,XGBoost_fback,LogisticRegression_pred,LogisticRegression_fback,StackModel_pred,StackModel_fback,RedNeuronal_pred,RedNeuronal_fback
 2024-09-12 09:52:07,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,False,0
+2024-09-12 10:58:04,1,1,22,1,2,895,5,5,4,4,3,3,3,5,2,3,5,4,2,5,10,0,1,1,1,1,1,1,True,1
