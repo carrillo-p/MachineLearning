@@ -112,6 +112,8 @@ def generar_grafico_XGB(tipo_grafico):
         plt.xlabel('Predicción')
         plt.ylabel('Valor Real')
         plt.title('Matriz de confusión')
+        plt.tight_layout()
+        st.pyplot(plt.gcf())
         
     elif tipo_grafico == "Curva ROC":
         fpr, tpr, _ = roc_curve(y_test, y_prob)
@@ -124,6 +126,8 @@ def generar_grafico_XGB(tipo_grafico):
         plt.ylabel('True Positive Rate')
         plt.title('Receiver Operating Characteristic')
         plt.legend(loc="lower right")
+        plt.tight_layout()
+        st.pyplot(plt.gcf())
         
     elif tipo_grafico == "Overfitting":
         st.image('overfit_xgb.png', use_column_width=True)
@@ -143,9 +147,8 @@ def generar_grafico_XGB(tipo_grafico):
         plt.title('Importancia de las Variables en el Modelo XGBoost')
         plt.xlabel('Importancia')
         plt.ylabel('Variable')
-    
-    plt.tight_layout()  # Ajustar el diseño
-    st.pyplot(plt.gcf())
+        plt.tight_layout()
+        st.pyplot(plt.gcf())
 
 
 def generar_grafico_stack(tipo_grafico):
