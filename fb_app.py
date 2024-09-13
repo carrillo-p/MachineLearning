@@ -195,7 +195,7 @@ if st.button('Ver Resultados'):
         'Customer Type': 0 if customer_type == 'Leal' else 1,
         'Age': age,
         'Type of Travel': 0 if type_of_travel == 'Personal' else 1,
-        'Class': 0 if class_type == 'Económica' else (1 if class_type == 'Económica Plus' else 2),
+        'Class': 0 if class_type == 'Económica Plus' else (1 if class_type == 'Negocios' else 2),
         'Flight Distance': flight_distance,
         'Inflight wifi service': inflight_wifi_service,
         'Departure/Arrival time convenient': departure_arrival_time_convenient,
