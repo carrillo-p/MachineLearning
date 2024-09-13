@@ -269,27 +269,4 @@ if st.session_state.results_shown:
         hide_index=True,
     )
 
-    # Botón para enviar el formulario
-    '''
-    if st.button('Enviar Formulario'):
-        # Verificar si todos los feedbacks han sido proporcionados
-        if edited_df['Feedback'].isnull().sum() == 0:
-            # Codificar el feedback: Sí -> 1, No -> 0
-            feedback = dict(zip(edited_df['Modelo'], (edited_df['Feedback'] == 'Sí').astype(int)))
-            
-            # Guardar en CSV
-            save_to_csv(st.session_state.data, st.session_state.predictions, feedback)        
 
-            # Guardar en base de datos
-            save_to_database(st.session_state.data, st.session_state.predictions, feedback)
-            
-            # Reiniciar las variables de estado
-            st.session_state.results_shown = False
-            st.session_state.data = None
-            st.session_state.predictions = None
-
-            # Mensaje de agradecimiento
-            st.success('¡Muchas gracias por tu colaboración! Tu opinión nos ayudará a mejorar tu próxima experiencia de vuelo.')
-        else:
-            st.warning('Por favor, proporciona feedback para todas las predicciones antes de enviar el formulario.')
-    '''
