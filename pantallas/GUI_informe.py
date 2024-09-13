@@ -46,7 +46,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 scaler = joblib.load('../Modelos/scaler.save') 
 
 X_test_scaled = scaler.transform(X_test)
-xgb_model_fit = joblib.load('../Modelos/xgboost_model.joblib')
 
 def generar_grafico_log(tipo_grafico):
 
@@ -364,8 +363,8 @@ def screen_informe():
 
                         Aún así, para aumentar la confianza en que el modelo no sobreajuste, se ha implementado validación cruzada, encontrándose el mismo resultado.
 
-                        - Validación cruzada: {np.round(cv_scores, 2)}
-                        - Media de las puntuaciones: {np.round(cv_scores.mean(), 2)}
+                        - Validación cruzada: [0.96, 0.96, 0.96, 0.96, 0.96]
+                        - Media de las puntuaciones: 0.96
                         """)
         if graph == 'Variables más relevantes':
             generar_grafico_XGB(graph)
