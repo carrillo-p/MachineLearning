@@ -81,7 +81,7 @@ def generar_grafico_log(tipo_grafico):
         plt.tight_layout()  # Ajustar el diseño
         st.pyplot(plt.gcf())
     elif tipo_grafico == "Overfitting":
-        st.image('output.png', use_column_width=True)
+        st.image('overfit_log.png', use_column_width=True)
     elif tipo_grafico == 'Variables más relevantes':
         coefficients = log_model.model.coef_[0]
         feature_names = X.columns
@@ -126,15 +126,7 @@ def generar_grafico_XGB(tipo_grafico):
         plt.legend(loc="lower right")
         
     elif tipo_grafico == "Overfitting":
-        results = xgb_model.evals_result()
-        epochs = len(results['validation_0']['logloss'])
-        x_axis = range(0, epochs)
-        plt.plot(x_axis, results['validation_0']['logloss'], label='Train')
-        plt.plot(x_axis, results['validation_1']['logloss'], label='Test')
-        plt.legend(loc='upper right')
-        plt.xlabel('Number of Trees')
-        plt.ylabel('Log Loss')
-        plt.title('XGBoost Log Loss')
+        st.image('overfit_xgb.png', use_column_width=True)
 
     elif tipo_grafico == 'Variables más relevantes':
         importance = xgb_model.model.feature_importances_
