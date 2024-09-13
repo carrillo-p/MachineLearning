@@ -42,12 +42,12 @@ def predict(data, model, scaler = scaler):
         try:
             if isinstance(model, tf.keras.Model):
                 data_scaled = scaler.transform(data)
-                neural_prob = neural_model.predict(inputs_scaled)
+                neural_prob = model.predict(data_scaled)
                 neural_prob = float(neural_prob[0, 0])
                 neural_pred = 1 if neural_prob > 0.5 else 0
                 return neural_pred
             else:
-                proba = model.predict_proba(inputs)[0]
+                proba = model.predict_proba(data)[0]
                 pred = 1 if proba[1] > 0.5 else 0
             return pred
         except Exception as e:
