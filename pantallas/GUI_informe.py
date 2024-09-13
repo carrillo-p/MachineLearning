@@ -280,6 +280,8 @@ def screen_informe():
     if st.session_state['modelo_seleccionado'] == 'XGBoost':
         xgb_model = joblib.load('../Modelos/xgboost_model.joblib')
 
+        y_pred = xgb_model.predict(X_test)
+        
         accuracy = accuracy_score(y_test, y_pred)
 
         cv_scores = cross_val_score(xgb_model, X, y, cv=5)
