@@ -46,6 +46,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 scaler = joblib.load('../Modelos/scaler.save') 
 
 X_test_scaled = scaler.transform(X_test)
+xgb_model_fit = joblib.load('../Modelos/xgboost_model.joblib')
+
 def generar_grafico_log(tipo_grafico):
 
     y_pred = log_model.predict(X_test)
@@ -281,7 +283,7 @@ def screen_informe():
         
         accuracy = accuracy_score(y_test, y_pred)
 
-        cv_scores = cross_val_score(xgb_model, X, y, cv=5)
+        cv_scores = cross_val_score(xgb_model_fit, X, y, cv=5)
 
         st.markdown("""
                     XGBoost es un algoritmo de _gradient boosting_ que ha ganado popularidad gracias a su velocidad y buenos resultados, especialmente para datos como los que estamos trabajando. 
