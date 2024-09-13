@@ -49,7 +49,7 @@ def predict(data, model, scaler = scaler):
             else:
                 proba = model.predict_proba(data)[0]
                 pred = 1 if proba[1] > 0.5 else 0
-            return pred
+                return pred
         except Exception as e:
             st.error(f"Error al hacer la predicción: {str(e)}")
         return None
