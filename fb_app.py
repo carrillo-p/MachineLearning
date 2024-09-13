@@ -52,7 +52,7 @@ def predict(data, model, scaler = scaler):
             return pred
         except Exception as e:
             st.error(f"Error al hacer la predicción: {str(e)}")
-    return None
+        return None
 
 # Función para guardar los resultados en CSV
 def save_to_csv(data, predictions, feedback):
