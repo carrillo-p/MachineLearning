@@ -277,6 +277,7 @@ def screen_informe():
             st.session_state['modelo_seleccionado'] = 'CNN'
 
     if st.session_state['modelo_seleccionado'] == 'XGBoost':
+        y_pred = xgb_model.predict(X_test)
         
         accuracy = accuracy_score(y_test, y_pred)
 
