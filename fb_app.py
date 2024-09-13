@@ -34,16 +34,21 @@ xgboost_model = load_model(os.path.join(model_dir, 'xgboost_model.joblib'))
 logistic_model = load_model(os.path.join(model_dir, 'logistic_model.joblib'))
 stack_model = load_model(os.path.join(model_dir, 'stack_model.joblib'))
 neuronal_model = load_model(os.path.join(model_dir, 'neuronal.keras'))
+scaler = joblib.load(os.path.join(model_dir, 'scaler.save'))
 
 # Función para hacer predicciones
-def predict(data, model):
+def predict(data, model, scaler = scaler):
     if model is not None:
         try:
             if isinstance(model, tf.keras.Model):
-                pred = model.predict(data)
-                return pred[0][0] > 0.5
+                data_scaled = scaler.transform(data)
+                neural_prob = neural_model.predict(inputs_scaled)
+                neural_prob = float(neural_prob[0, 0])
+                neural_pred = 1 if neural_prob > 0.5 else 0
+                return neural_pred
             else:
-                pred = model.predict(data)[0]
+                proba = model.predict_proba(inputs)[0]
+                pred = 1 if proba[1] > 0.5 else 0
             return pred
         except Exception as e:
             st.error(f"Error al hacer la predicción: {str(e)}")
