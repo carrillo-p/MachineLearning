@@ -282,8 +282,6 @@ def screen_informe():
         
         accuracy = accuracy_score(y_test, y_pred)
 
-        cv_scores = cross_val_score(xgb_model_fit, X, y, cv=5)
-
         st.markdown("""
                     XGBoost es un algoritmo de _gradient boosting_ que ha ganado popularidad gracias a su velocidad y buenos resultados, especialmente para datos como los que estamos trabajando. 
 
