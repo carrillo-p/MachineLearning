@@ -125,8 +125,7 @@ def generar_grafico_XGB(tipo_grafico):
         plt.legend(loc="lower right")
         
     elif tipo_grafico == "Overfitting":
-        xgb_model_2 = joblib.load('../Modelos/xgboost_model.joblib')
-        results = xgb_model_2.evals_result()
+        results = xgb_model.evals_result()
         epochs = len(results['validation_0']['logloss'])
         x_axis = range(0, epochs)
         plt.plot(x_axis, results['validation_0']['logloss'], label='Train')
@@ -278,9 +277,6 @@ def screen_informe():
             st.session_state['modelo_seleccionado'] = 'CNN'
 
     if st.session_state['modelo_seleccionado'] == 'XGBoost':
-        xgb_model = joblib.load('../Modelos/xgboost_model.joblib')
-
-        y_pred = xgb_model.predict(X_test)
         
         accuracy = accuracy_score(y_test, y_pred)
 
