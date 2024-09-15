@@ -11,7 +11,7 @@ def screen_results():
 
     clientes = pd.read_csv('Clientes_simulados.csv')
 
-    columnas_feedback = ['Acierto_Logistico','Acierto_XGboost', 'Acierto_Stacked', 'Acierto_CNN']
+    columnas_feedback = ['Acierto_Logistico','Acierto_XGboost', 'Acierto_Stacked', 'Acierto_NeuralN']
 
     medias = clientes[columnas_feedback].mean()
 
