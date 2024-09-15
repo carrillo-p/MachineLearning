@@ -62,11 +62,13 @@ def screen_results():
     ax.set_title('Media de columnas seleccionadas (en porcentajes)')
     ax.set_xlabel('Columnas')
     ax.set_ylabel('Media (%)')
+    ax.set_xticks(range(len(df_porcentajes)))
+    ax.set_xticklabels(df_porcentajes['Columna'])
     ax.grid(axis='y', linestyle='--', alpha=0.7)
-
-    for p in bar_plot.patches:
-        height = p.get_height()
-        ax.text(p.get_x() + p.get_width() / 2., height + 0.5, f'{height:.1f}', ha='center', va='bottom')
+    
+    for i, (index, row) in enumerate(df_porcentajes.iterrows()):
+        percentage = row['Media (%)']
+        ax.text(i, percentage + 2, f'{percentage:.1f}', ha='center', va='bottom')
 
 
     st.pyplot(fig)
