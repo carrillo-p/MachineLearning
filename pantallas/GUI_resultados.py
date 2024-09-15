@@ -3,6 +3,8 @@ import os
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from PIL import Image
+import matplotlib.patches as patches
 
 def screen_results():
     for dirpath, dirnames, filenames in os.walk("."):
@@ -41,9 +43,22 @@ def screen_results():
     # Muestra el mensaje en un cuadro de texto en Streamlit
     st.title(mensaje)
 
+    imagen_barra = Image.open('avion.png')
 
     fig, ax = plt.subplots(figsize=(8, 6))
-    bar_plot = sns.barplot(x='Columna', y='Media (%)', data=df_porcentajes, palette = 'viridis', ax=ax)
+
+    for i, (index, row) in enumerate(df_porcentajes.iterrows()):
+        percentage = row['Media (%)']
+        
+        # Redimensionar la imagen en función del porcentaje
+        imagen_redimensionada = imagen_barra.copy()
+        ancho, alto = imagen_redimensionada.size
+        nuevo_alto = int(alto * (percentage / 100))
+        imagen_redimensionada = imagen_redimensionada.crop((0, alto - nuevo_alto, ancho, alto))
+        
+        # Mostrar la imagen en el gráfico
+        ax_img = ax.imshow(imagen_redimensionada, aspect='auto', extent=(i - 0.4, i + 0.4, 0, percentage), zorder=1)
+    
     ax.set_title('Media de columnas seleccionadas (en porcentajes)')
     ax.set_xlabel('Columnas')
     ax.set_ylabel('Media (%)')
